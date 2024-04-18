@@ -131,27 +131,24 @@ def process_text(doc, rejoin=False):
 
     return trans_text
 
-
 # Charger le modèle
-modele = load_model('Gloves_GRU100K.keras')
+modele = load_model('Model/Gloves_GRU100K.keras')
 
 # Charger le tokenizer
-with open('tokenizer.pickle', 'rb') as handle:
+with open('Model/tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
 
 # Créer une instance FastAPI
 app = FastAPI()
 
-
 # Définir un modèle Pydantic pour le corps de la requête
 class Tweet(BaseModel):
     text: str
 
-
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
     # Prétraiter le tweet
-    tweet = process_text(tweet.text, rejoin=True, lemm_or_stemm="lem", force_is_alpha=True, include_stopwords=True)
+    tweet = process_text(tweet.text, rejoin=True)
     seq = tokenizer.texts_to_sequences([tweet])
     pad = pad_sequences(seq, maxlen=89, padding='post', truncating='post')
 
