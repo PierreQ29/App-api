@@ -1,9 +1,5 @@
 import re
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 import streamlit as st
-from tensorflow.keras.models import load_model
-import tensorflow as tf
 import pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -109,7 +105,6 @@ def expand_contractions(text: str) -> str:
 
     return text
 
-
 def process_text(doc, rejoin=False):
     # lower
     doc = doc.lower().strip()
@@ -132,11 +127,13 @@ def process_text(doc, rejoin=False):
     return trans_text
 
 # Charger le modèle
-modele = load_model('Model/Gloves_GRU100K.keras')
+with open('Model/model.pkl', 'rb') as f:
+    model = pickle.load(f)
 
-# Charger le tokenizer
-with open('Model/tokenizer.pickle', 'rb') as handle:
-    tokenizer = pickle.load(handle)
+# Charger le vectoriseur
+with open('Model/vectorizer.pkl', 'rb') as f:
+    vectorizer = pickle.load(f)
+
 
 # Créer une instance FastAPI
 app = FastAPI()
@@ -145,17 +142,20 @@ app = FastAPI()
 class Tweet(BaseModel):
     text: str
 
+
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
     # Prétraiter le tweet
     tweet = process_text(tweet.text, rejoin=True)
-    seq = tokenizer.texts_to_sequences([tweet])
-    pad = pad_sequences(seq, maxlen=89, padding='post', truncating='post')
+
+    # Transformer le texte avec le vectoriseur
+    tweet_vec = vectorizer.transform([tweet])
 
     # Prédire le sentiment du tweet
-    prediction = modele.predict(pad)
+    prediction = model.predict(tweet_vec)
 
     # Interpréter la prédiction
     sentiment = 'positif' if prediction[0] > 0.5 else 'négatif'
 
     return {"sentiment": sentiment}
+
