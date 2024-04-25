@@ -167,4 +167,7 @@ async def predict_sentiment(tweet: Tweet):
 
     return {"sentiment": sentiment}
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
