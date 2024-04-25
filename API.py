@@ -144,8 +144,7 @@ class Tweet(BaseModel):
     text: str
 
 # Programmation des traces envoyé à Azure Application Insights
-exporter = AzureExporter(instrumentation_key='43e208fa-70a1-4839-9d08-920a10b88db7')
-tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
+tracer = Tracer(exporter=AzureExporter(connection_string='InstrumentationKey=43e208fa-70a1-4839-9d08-920a10b88db7;IngestionEndpoint=https://francecentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://francecentral.livediagnostics.monitor.azure.com/'), sampler=ProbabilitySampler(1.0))
 
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
