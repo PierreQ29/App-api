@@ -136,7 +136,6 @@ with open('Model/model.pkl', 'rb') as f:
 with open('Model/vectorizer.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 
-
 # Créer une instance FastAPI
 app = FastAPI()
 
@@ -144,14 +143,17 @@ app = FastAPI()
 class Tweet(BaseModel):
     text: str
 
+# Programmation des traces envoyé à Azure Application Insights
+exporter = AzureExporter(instrumentation_key='0acfd902-d17e-46de-8131-cd05fb331e9d')
+tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
 
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
     # Prétraiter le tweet
-    tweet = process_text(tweet.text, rejoin=True)
+    processed_tweet = process_text(tweet.text, rejoin=True)
 
     # Transformer le texte avec le vectoriseur
-    tweet_vec = vectorizer.transform([tweet])
+    tweet_vec = vectorizer.transform([processed_tweet])
 
     # Prédire le sentiment du tweet
     prediction = model.predict(tweet_vec)
@@ -159,14 +161,11 @@ async def predict_sentiment(tweet: Tweet):
     # Interpréter la prédiction
     sentiment = 'positif' if prediction[0] > 0.5 else 'négatif'
 
+    # Envoyer les traces à Azure Application Insights
+    with tracer.span(name='mytask') as span:
+        span.add_attribute('tweet', processed_tweet)
+        span.add_attribute('prediction', sentiment)
+
     return {"sentiment": sentiment}
 
-# Programmation des traces envoyé à Azure Application Insights
-
-exporter = AzureExporter(instrumentation_key='0acfd902-d17e-46de-8131-cd05fb331e9d')
-tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
-
-with tracer.span(name='mytask') as span:
-    span.add_attribute('tweet', 'le texte du tweet')
-    span.add_attribute('prediction', 'la prédiction')
 
