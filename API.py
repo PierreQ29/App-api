@@ -5,7 +5,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-
+from opencensus.ext.azure.trace_exporter import AzureExporter
+from opencensus.trace.tracer import Tracer
+from opencensus.trace.samplers import ProbabilitySampler
 
 
 # Fonction pour étendre les contractions
@@ -159,3 +161,11 @@ async def predict_sentiment(tweet: Tweet):
 
     return {"sentiment": sentiment}
 
+# Programmation des traces envoyé à Azure Application Insights
+
+exporter = AzureExporter(instrumentation_key='0acfd902-d17e-46de-8131-cd05fb331e9d')
+tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
+
+with tracer.span(name='mytask'):
+    tracer.add_attribute('tweet', 'le texte du tweet')
+    tracer.add_attribute('prediction', 'la prédiction')
