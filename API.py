@@ -144,7 +144,7 @@ class Tweet(BaseModel):
     text: str
 
 # Programmation des traces envoyé à Azure Application Insights
-exporter = AzureExporter(instrumentation_key='0acfd902-d17e-46de-8131-cd05fb331e9d')
+exporter = AzureExporter(instrumentation_key='43e208fa-70a1-4839-9d08-920a10b88db7')
 tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
 
 @app.post("/predict")
