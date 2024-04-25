@@ -8,7 +8,7 @@ tweet = st.text_input('Entrez votre tweet ici:')
 
 if tweet:
     # Envoyer une requête à l'API
-    response = requests.post('https://testapiapp-5f6b29d3d155.herokuapp.com/predict', json={'text': tweet})
+    response = requests.post('https://apiappocp7-dde30b3da808.herokuapp.com/predict', json={'text': tweet})
 
 
     # Vérifier que la requête a réussi

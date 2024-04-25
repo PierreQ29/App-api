@@ -1,12 +1,12 @@
 {
   "name": "Mon application FastAPI",
-  "description": "Une API pour prédire le sentiment des tweets",
+  "description": "Une API pour prï¿½dire le sentiment des tweets",
   "scripts": {
     "test": "pytest"
   },
   "env": {
     "PORT": {
-      "description": "Le port sur lequel l'application doit écouter",
+      "description": "Le port de l'application",
       "value": "5000"
     }
   },
