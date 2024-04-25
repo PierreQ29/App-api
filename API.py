@@ -166,6 +166,7 @@ async def predict_sentiment(tweet: Tweet):
 exporter = AzureExporter(instrumentation_key='0acfd902-d17e-46de-8131-cd05fb331e9d')
 tracer = Tracer(exporter=exporter, sampler=ProbabilitySampler(1.0))
 
-with tracer.span(name='mytask'):
-    tracer.add_attribute('tweet', 'le texte du tweet')
-    tracer.add_attribute('prediction', 'la prédiction')
+with tracer.span(name='mytask') as span:
+    span.add_attribute('tweet', 'le texte du tweet')
+    span.add_attribute('prediction', 'la prédiction')
+
