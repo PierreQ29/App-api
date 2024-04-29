@@ -5,10 +5,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-from opencensus.ext.azure.trace_exporter import AzureExporter
-from opencensus.trace.tracer import Tracer
-from opencensus.trace.samplers import ProbabilitySampler
-from opencensus.trace.span import SpanKind
+import applicationinsights
+from applicationinsights import TelemetryClient
 
 
 # Fonction pour étendre les contractions
@@ -144,15 +142,9 @@ app = FastAPI()
 class Tweet(BaseModel):
     text: str
 
-# setup
-sample_probability = 1.0
-connection_string = 'InstrumentationKey=43e208fa-70a1-4839-9d08-920a10b88db7;IngestionEndpoint=https://francecentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://francecentral.livediagnostics.monitor.azure.com/'
 
-# The AzureExporter sends the logs to Application Insights
-exporter = AzureExporter(connection_string=connection_string)
-
-# The tracer is responsible for tracking the durations and metadata of the events
-tracer = Tracer(sampler=ProbabilitySampler(sample_probability), exporter=exporter)
+instrumentation_key = '43e208fa-70a1-4839-9d08-920a10b88db7'   # Remplacez par votre clé d'instrumentation
+client = TelemetryClient(instrumentation_key)
 
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
@@ -168,16 +160,15 @@ async def predict_sentiment(tweet: Tweet):
     # Interpréter la prédiction
     sentiment = 'positif' if prediction[0] > 0.5 else 'négatif'
 
-    # start the measurement
-    span = tracer.start_span("predict_sentiment")
-    span.span_kind = SpanKind.SERVER # This tell Application Insights that this is a request log
-
     # Envoyer les traces à Azure Application Insights
-    span.add_attribute('tweet', processed_tweet)
-    span.add_attribute('prediction', sentiment)
+    client.track_trace('predict_sentiment', {'tweet': processed_tweet, 'prediction': sentiment})
 
-    # end the measurement
-    tracer.end_span()
+    # Envoyer une métrique si le sentiment est négatif
+    if sentiment == 'négatif':
+        client.track_metric("V_NEG", 1)  # Incrémente la métrique de 1 pour chaque tweet négatif
+
+    # Envoi des données
+    client.flush()
 
     return {"sentiment": sentiment}
 
