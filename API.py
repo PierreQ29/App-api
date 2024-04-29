@@ -8,6 +8,7 @@ from nltk.tokenize import RegexpTokenizer
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.tracer import Tracer
 from opencensus.trace.samplers import ProbabilitySampler
+from opencensus.trace.span import SpanKind
 
 
 # Fonction pour étendre les contractions
@@ -143,8 +144,15 @@ app = FastAPI()
 class Tweet(BaseModel):
     text: str
 
-# Programmation des traces envoyé à Azure Application Insights
-tracer = Tracer(exporter=AzureExporter(connection_string='InstrumentationKey=43e208fa-70a1-4839-9d08-920a10b88db7;IngestionEndpoint=https://francecentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://francecentral.livediagnostics.monitor.azure.com/'), sampler=ProbabilitySampler(1.0))
+# setup
+sample_probability = 1.0
+connection_string = 'InstrumentationKey=43e208fa-70a1-4839-9d08-920a10b88db7;IngestionEndpoint=https://francecentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://francecentral.livediagnostics.monitor.azure.com/'
+
+# The AzureExporter sends the logs to Application Insights
+exporter = AzureExporter(connection_string=connection_string)
+
+# The tracer is responsible for tracking the durations and metadata of the events
+tracer = Tracer(sampler=ProbabilitySampler(sample_probability), exporter=exporter)
 
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
@@ -160,11 +168,18 @@ async def predict_sentiment(tweet: Tweet):
     # Interpréter la prédiction
     sentiment = 'positif' if prediction[0] > 0.5 else 'négatif'
 
+    # start the measurement
+    span = tracer.start_span("predict_sentiment")
+    span.span_kind = SpanKind.SERVER # This tell Application Insights that this is a request log
+
     # Envoyer les traces à Azure Application Insights
-    with tracer.span(name='mytask') as span:
-        span.add_attribute('tweet', processed_tweet)
-        span.add_attribute('prediction', sentiment)
+    span.add_attribute('tweet', processed_tweet)
+    span.add_attribute('prediction', sentiment)
+
+    # end the measurement
+    tracer.end_span()
 
     return {"sentiment": sentiment}
+
 
 
