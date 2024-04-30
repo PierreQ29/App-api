@@ -143,7 +143,7 @@ class Tweet(BaseModel):
     text: str
 
 
-instrumentation_key = '43e208fa-70a1-4839-9d08-920a10b88db7'   # Remplacez par votre clé d'instrumentation
+instrumentation_key = '43e208fa-70a1-4839-9d08-920a10b88db7'
 client = TelemetryClient(instrumentation_key)
 
 @app.post("/predict")
