@@ -25,10 +25,12 @@ if tweet:
         # Demander à l'utilisateur si la prédiction était correcte
         feedback = st.selectbox('La prédiction était-elle correcte ?', ('Sélectionnez une option', 'Oui', 'Non'))
 
-        # Si l'utilisateur a donné son feedback, l'envoyer à Application Insights
-        if feedback != 'Sélectionnez une option':
-            client.track_trace('feedback', {'tweet': tweet, 'prediction': prediction, 'feedback': feedback})
-            client.flush()
+        # Ajouter un bouton "Soumettre"
+        if st.button('Soumettre'):
+            # Si l'utilisateur a donné son feedback, l'envoyer à Application Insights
+            if feedback != 'Sélectionnez une option':
+                client.track_trace('feedback', {'tweet': tweet, 'prediction': prediction, 'feedback': feedback})
+                client.flush()
 
     else:
         st.write('Une erreur s\'est produite lors de la prédiction du sentiment.')
