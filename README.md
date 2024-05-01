@@ -18,11 +18,13 @@ Le projet est organisé en plusieurs fichiers :
 
 - requirements.txt : Ce fichier liste les librairies nécessaires au bon fonctionnement de l'application.
 
+- Les autres fichiers permettent le bon fonctionnement du déploiement continu sur la plateforme cloud.
+
 
 ## Utilisation
 -Télécharger le fichier stream.py ainsi que le fichier requirements.txt ou cloner directement tout le repository avec git clone.
-- Définir un nouvel environnement 
-- Installer les librairies en executant "pip install -r requirements.txt"
+- Définir un nouvel environnement.
+- Installer les librairies dans le nouvel environnement en executant "pip install -r requirements.txt"
 - Executer le script stream.py en utilisant streamlit. Dans le terminal executer "streamlit run strem.py"
 - L'interface utilisateur s'ouvre et vous demande de saisir un tweet. L'application est réalisé pour travailler sur des tweets en anglais.
 - Saisissez un tweet et appuyer sur la touche entrée.
