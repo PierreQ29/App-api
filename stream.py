@@ -14,7 +14,7 @@ if 'prediction' not in st.session_state:
 # Ajouter un bouton "Soumettre"
 if st.button('Soumettre') and tweet:
     # Envoyer une requête à l'API
-    response = requests.post('http://localhost:8000/predict', json={'text': tweet})
+    response = requests.post('https://apiappocp7-dde30b3da808.herokuapp.com/predict', json={'text': tweet})
 
     # Vérifier que la requête a réussi
     if response.status_code == 200:
@@ -32,7 +32,7 @@ if st.session_state['prediction'] is not None:
 
     # Si l'utilisateur a fourni un feedback "Non", envoyer une requête à l'API de feedback
     if feedback == 'Non':
-        requests.post('http://localhost:8000/feedback', json={'text': tweet, 'prediction': st.session_state['prediction'], 'feedback': feedback})
+        requests.post('https://apiappocp7-dde30b3da808.herokuapp.com/feedback', json={'text': tweet, 'prediction': st.session_state['prediction'], 'feedback': feedback})
 
 
 
