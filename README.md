@@ -4,7 +4,6 @@
 
 Ce projet a pour but de développer une API qui prédit le sentiment d'un tweet. L'API prend un tweet en entrée et renvoie une prédiction de sentiment (positif ou négatif). Les prédictions sont basées sur un modèle de machine learning entraîné sur un ensemble de données de tweets en anglais.
 
-
 ## Structure du Projet
 
 L'API est déployé sur Heroku à l'adresse : https://apiappocp7-dde30b3da808.herokuapp.com/
@@ -13,7 +12,7 @@ Si vous souhaitez déployer votre propre modèle, n'oubliez pas de changer l'adr
 
 Le projet est organisé en plusieurs fichiers :
 
-- Model : Dossier contenant le modèle et le vectoriseur utilisés pour transformer les tweets en vecteurs. Le modèle a été entraîné en dehors de ce projet et est chargé à partir d'un fichier pickle.
+- Model : Dossier contenant le modèle et le vectoriseur utilisés pour transformer les tweets en vecteurs. Le modèle a été entraîné en dehors de ce projet et est chargé à partir d'un fichier pickle. 
 
 - API.py : Ce fichier contient le code de l'API FastAPI. L'API a une seule route, `/predict`, qui prend un tweet en entrée et renvoie une prédiction de sentiment. 
 
