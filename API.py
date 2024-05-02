@@ -144,7 +144,7 @@ class Tweet(BaseModel):
 
 
 instrumentation_key = '43e208fa-70a1-4839-9d08-920a10b88db7'
-client = TelemetryClient(instrumentation_key)
+tc = TelemetryClient(instrumentation_key)
 
 @app.post("/predict")
 async def predict_sentiment(tweet: Tweet):
@@ -160,17 +160,29 @@ async def predict_sentiment(tweet: Tweet):
     # Interpréter la prédiction
     sentiment = 'positif' if prediction[0] > 0.5 else 'négatif'
 
-    # Envoyer les traces à Azure Application Insights
-    client.track_trace('predict_sentiment', {'tweet': processed_tweet, 'prediction': sentiment})
+    # Incrémenter la métrique personnalisée "TotalPredictions"
+    tc.track_metric('TotalPred', 1)
 
-    # Envoyer une métrique si le sentiment est négatif
-    if sentiment == 'négatif':
-        client.track_metric("V_NEG", 1)  # Incrémente la métrique de 1 pour chaque tweet négatif
-
-    # Envoi des données
-    client.flush()
+    tc.flush()
 
     return {"sentiment": sentiment}
 
+
+class Feedback(BaseModel):
+    text: str
+    prediction: str
+    feedback: str
+
+
+@app.post("/feedback")
+async def receive_feedback(feedback: Feedback):
+    # Si la prédiction est incorrecte, envoyer une trace à Application Insights
+    if feedback.feedback == 'Non':
+        tc.track_trace(f'Mauvaise prédiction pour le tweet "{feedback.text}". Prédiction : {feedback.prediction}')
+
+        # Incrémenter la métrique personnalisée "MauvaisePred"
+        tc.track_metric('MauvaisePred', 1)
+
+        tc.flush()
 
 
