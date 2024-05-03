@@ -14,7 +14,9 @@ Le projet est organisé en plusieurs fichiers :
 
 - Model : Dossier contenant le modèle et le vectoriseur utilisés pour transformer les tweets en vecteurs. Le modèle a été entraîné en dehors de ce projet et est chargé à partir d'un fichier pickle. 
 
-- API.py : Ce fichier contient le code de l'API FastAPI. L'API a une seule route, `/predict`, qui prend un tweet en entrée et renvoie une prédiction de sentiment. 
+- API.py : Ce fichier contient le code de l'API FastAPI. L'API a 2 routes :
+    `/predict`, qui prend un tweet en entrée et renvoie une prédiction de sentiment. Il renvoit également une trace "TotalPred" à l'Application Insights pour contabiliser le nombre de prédictions réalisées.
+    '/feedback', qui prend en entrée un tweet, la prédiction réalisé par le modèle et le feedback de l'utilisateur pour savoir si la prédiction est correcte ou non. Il renvoit un trace "MauvaisePred" à l'Application Insights si l'utilisateur considère que la prédiction du sentiment du tweet est incorrecte.
 
 - Procfile : Fichier utilisé par Heroku pour déterminer comment éxecuter l'application.
 
